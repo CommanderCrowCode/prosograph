@@ -1,0 +1,103 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+venv/
+env/
+.venv/
+.env
+
+# UV Package Manager
+.uv/
+uv.lock
+
+# LaTeX
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+*.dvi
+*.xdv
+*.ps
+*.eps
+*.pdf
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+
+# Specific files
+repomix_output.*
+repomix-output.*
+
+# Vim
+*.swp
+*.swo
+*.swn
+.*.swp
+.*.swo
+.*.swn
+*~
+.netrwhist
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Claude Code
+.claude/
+!.claude/agents/
+*.claude.tmp
+.claude-cache/
+.qa-reports/
+
+# MCP connection
+.mcp*
+.*mcp*
+
+# Credentials
+credentials.json
+token.json
+*.credentials
+credentials/
+
+# NPM Packages
+
+# Swap files
+~*.*

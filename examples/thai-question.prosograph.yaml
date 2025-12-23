@@ -1,0 +1,165 @@
+# Thai Question Example - Prosograph v1.0
+# Demonstrates: tonal language, question intonation, lexical tone preservation
+# Profile: PG-Tonal
+
+prosograph: "1.0"
+id: "pg:example:thai-question-001"
+
+meta:
+  created_at: "2025-12-23T14:30:00+07:00"
+  created_by:
+    tool: "prosograph-examples"
+    version: "1.0.0"
+  profile: "PG-Tonal"
+  source:
+    transcript_source: "human"
+    alignment_source: "manual"
+
+audio:
+  uri: "file:thai-question.wav"
+  duration_s: 2.8
+  sample_rate_hz: 48000
+  channels: 1
+
+defaults:
+  language: "th-TH"
+  speaker:
+    id: "spk_female_01"
+    baseline:
+      f0_hz: 220
+      f0_range_hz: [180, 320]
+  tokenization:
+    unit: "word"
+
+lexicon:
+  tone_inventory:
+    thai:
+      - "mid"
+      - "low"
+      - "falling"
+      - "high"
+      - "rising"
+
+tracks:
+  tone:
+    scope: ["segment", "token"]
+    overlap: "allow"
+  emotion:
+    scope: ["segment"]
+    overlap: "allow"
+  prosody:
+    scope: ["segment", "token"]
+    overlap: "allow"
+
+segments:
+  - id: "seg_001"
+    t0: 0.0
+    t1: 2.6
+    text: "มาไหมวันนี้"
+    normalized_text: "มา ไหม วัน นี้"
+    tracks:
+      tone:
+        system: "thai"
+        phrase_type: "interrogative"
+        register: "mid"
+      emotion:
+        label: "curious"
+        vad:
+          valence: 0.2
+          arousal: 0.4
+          dominance: 0.5
+        confidence: 0.85
+        source: "human"
+      prosody:
+        rate_wpm: 140
+        pitch_st: 0.5
+        energy_db: 0.0
+    interaction:
+      tone_preservation: 0.95
+      emotion_pitch_override: 0.15
+      intonation_overlay: "additive"
+    tokens:
+      # มา (maa) - "come" - mid tone
+      - id: "tok_001"
+        t0: 0.0
+        t1: 0.45
+        kind: "word"
+        text: "มา"
+        ipa: "maː"
+        tracks:
+          tone:
+            lexical: "mid"
+            surface: "mid"
+            contour: "33"
+            realized:
+              onset_hz: 220
+              offset_hz: 225
+            confidence: 0.92
+
+      # ไหม (mai) - question particle - rising tone
+      - id: "tok_002"
+        t0: 0.45
+        t1: 1.0
+        kind: "word"
+        text: "ไหม"
+        ipa: "mǎj"
+        tracks:
+          tone:
+            lexical: "rising"
+            surface: "rising"
+            contour: "24"
+            realized:
+              onset_hz: 200
+              nadir_hz: 195
+              offset_hz: 280
+            confidence: 0.95
+          prosody:
+            pitch_st: 2.0
+            energy_db: 1.5
+
+      # วัน (wan) - "day" - mid tone
+      - id: "tok_003"
+        t0: 1.1
+        t1: 1.55
+        kind: "word"
+        text: "วัน"
+        ipa: "wan"
+        tracks:
+          tone:
+            lexical: "mid"
+            surface: "mid"
+            contour: "33"
+            realized:
+              onset_hz: 230
+              offset_hz: 228
+            confidence: 0.88
+
+      # นี้ (nii) - "this" - high tone (phrase-final rise for question)
+      - id: "tok_004"
+        t0: 1.55
+        t1: 2.4
+        kind: "word"
+        text: "นี้"
+        ipa: "níː"
+        tracks:
+          tone:
+            lexical: "high"
+            surface: "high"
+            contour: "45"
+            realized:
+              onset_hz: 260
+              offset_hz: 310
+            confidence: 0.90
+          prosody:
+            pitch_st: 3.5
+            energy_db: 2.0
+
+    events:
+      - t0: 2.4
+        t1: 2.6
+        type: "silence"
+        confidence: 0.99
+
+    notes:
+      - "Question particle ไหม triggers rising intonation pattern"
+      - "Final syllable นี้ shows phrase-final rise typical of Thai questions"

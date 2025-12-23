@@ -222,7 +222,7 @@ delivery:
   emphasis:
     - span: "not angry"           # OPTIONAL substring or token_ref span
       strength: 0.60              # [0,1]
-      method: ["pitch_up","duration_up","energy_up","pause_before"]
+      method: ["pitch_up","duration_up","energy_up","pause_before","pause_after"]
   pauses:
     - { t0: 0.42, t1: 0.58, type: "dramatic|breath|filled|unfilled" }
 
@@ -252,7 +252,7 @@ Tone MUST separate:
 Tone differs by tone.system.
 
 tone:
-  system: "thai|mandarin|vietnamese|pitch-accent|stress-accent|none"  # REQUIRED when tone used
+  system: "thai|mandarin|vietnamese|cantonese|pitch-accent|stress-accent|none"  # REQUIRED when tone used
   phrase_type: "declarative|interrogative|continuation|exclamative"  # OPTIONAL segment-level
   register: "low|mid|high"                                           # OPTIONAL
   downstep: 0.0                                                      # OPTIONAL [0,1]
@@ -274,7 +274,7 @@ tone:
   confidence: 0.9                # OPTIONAL
 
 Constraints:
-	•	If tone.system is tonal (thai/mandarin/vietnamese), tokens that represent tone-bearing units SHOULD include tone.lexical.
+	•	If tone.system is tonal (thai/mandarin/vietnamese/cantonese), tokens that represent tone-bearing units SHOULD include tone.lexical.
 	•	For pitch-accent, lexical MAY be an accent pattern (e.g., H-L), and realized anchors MAY describe f0.
 	•	For stress-accent, tone MAY be replaced by prosody + prominence, but the structure remains valid.
 

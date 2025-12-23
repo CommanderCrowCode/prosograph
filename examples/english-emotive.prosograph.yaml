@@ -1,0 +1,339 @@
+# English Emotive Example - Prosograph v1.0
+# Demonstrates: emotion, prosody, voice quality, emphasis, pauses
+# Profile: PG-Expressive
+# Scenario: Disappointed response to bad news
+
+prosograph: "1.0"
+id: "pg:example:english-emotive-001"
+
+meta:
+  created_at: "2025-12-23T14:45:00+07:00"
+  created_by:
+    tool: "prosograph-examples"
+    version: "1.0.0"
+  profile: "PG-Expressive"
+  source:
+    transcript_source: "human"
+    alignment_source: "whisperx"
+  references:
+    energy_db_ref: "relative to speaker baseline loudness"
+
+audio:
+  uri: "file:english-emotive.wav"
+  duration_s: 5.8
+  sample_rate_hz: 44100
+  channels: 1
+
+defaults:
+  language: "en-US"
+  speaker:
+    id: "spk_male_01"
+    baseline:
+      f0_hz: 120
+      f0_range_hz: [85, 180]
+      loudness_lufs: -18
+  tokenization:
+    unit: "word"
+
+lexicon:
+  emotion_inventory:
+    - "disappointed"
+    - "frustrated"
+    - "resigned"
+    - "sad"
+    - "neutral"
+
+tracks:
+  emotion:
+    scope: ["segment", "token"]
+    overlap: "allow"
+  prosody:
+    scope: ["segment", "token"]
+    overlap: "allow"
+  delivery:
+    scope: ["segment"]
+    overlap: "allow"
+  voice_quality:
+    scope: ["segment", "token"]
+    overlap: "allow"
+
+segments:
+  # Segment 1: Initial reaction with sigh
+  - id: "seg_001"
+    t0: 0.0
+    t1: 2.4
+    text: "Oh... I really thought this time would be different."
+    normalized_text: "oh i really thought this time would be different"
+    tracks:
+      emotion:
+        label: "disappointed"
+        vad:
+          valence: -0.6
+          arousal: 0.25
+          dominance: 0.3
+        confidence: 0.88
+        source: "human"
+      prosody:
+        rate_wpm: 95
+        pitch_st: -1.5
+        pitch_range_st: 4.0
+        energy_db: -2.0
+        contour:
+          - { t: 0.3, f0_hz: 140 }
+          - { t: 0.8, f0_hz: 115 }
+          - { t: 1.5, f0_hz: 125 }
+          - { t: 2.2, f0_hz: 100 }
+      delivery:
+        enunciation: "careful"
+        clarity: 0.85
+        emphasis:
+          - span: "really"
+            strength: 0.7
+            method: ["pitch_up", "duration_up"]
+          - span: "different"
+            strength: 0.5
+            method: ["duration_up", "pause_before"]
+        pauses:
+          - { t0: 0.15, t1: 0.35, type: "breath" }
+          - { t0: 1.85, t1: 2.0, type: "dramatic" }
+      voice_quality:
+        creak: 0.35
+        breathiness: 0.45
+        nasal: 0.1
+        tension: 0.2
+        smile: 0.0
+    interaction:
+      tone_preservation: 0.3
+      emotion_pitch_override: 0.7
+      intonation_overlay: "additive"
+    tokens:
+      - id: "tok_001"
+        t0: 0.0
+        t1: 0.15
+        kind: "word"
+        text: "Oh"
+        ipa: "oʊ"
+        stress: 1
+        tracks:
+          prosody:
+            pitch_st: 2.0
+          voice_quality:
+            breathiness: 0.6
+
+      - id: "tok_002"
+        t0: 0.35
+        t1: 0.55
+        kind: "word"
+        text: "I"
+        ipa: "aɪ"
+        stress: 0
+
+      - id: "tok_003"
+        t0: 0.55
+        t1: 0.95
+        kind: "word"
+        text: "really"
+        ipa: "ˈɹɪli"
+        stress: 1
+        tracks:
+          prosody:
+            pitch_st: 1.5
+            energy_db: 2.0
+          voice_quality:
+            tension: 0.4
+
+      - id: "tok_004"
+        t0: 0.95
+        t1: 1.25
+        kind: "word"
+        text: "thought"
+        ipa: "θɔːt"
+        stress: 1
+
+      - id: "tok_005"
+        t0: 1.25
+        t1: 1.45
+        kind: "word"
+        text: "this"
+        ipa: "ðɪs"
+        stress: 0
+
+      - id: "tok_006"
+        t0: 1.45
+        t1: 1.7
+        kind: "word"
+        text: "time"
+        ipa: "taɪm"
+        stress: 1
+
+      - id: "tok_007"
+        t0: 1.7
+        t1: 1.85
+        kind: "word"
+        text: "would"
+        ipa: "wʊd"
+        stress: 0
+
+      - id: "tok_008"
+        t0: 1.85
+        t1: 2.0
+        kind: "event"
+        event: "silence"
+
+      - id: "tok_009"
+        t0: 2.0
+        t1: 2.4
+        kind: "word"
+        text: "be different"
+        ipa: "bi ˈdɪfɹənt"
+        stress: 2
+        tracks:
+          prosody:
+            pitch_st: -2.5
+            energy_db: -1.0
+          voice_quality:
+            creak: 0.5
+
+  # Segment 2: Resigned acceptance
+  - id: "seg_002"
+    t0: 2.6
+    t1: 5.6
+    text: "But I guess... it's just how things go sometimes."
+    normalized_text: "but i guess it is just how things go sometimes"
+    tracks:
+      emotion:
+        label: "resigned"
+        vad:
+          valence: -0.35
+          arousal: 0.15
+          dominance: 0.25
+        confidence: 0.82
+        source: "human"
+      prosody:
+        rate_wpm: 85
+        pitch_st: -2.0
+        pitch_range_st: 3.0
+        energy_db: -3.5
+      delivery:
+        enunciation: "casual"
+        clarity: 0.75
+        emphasis:
+          - span: "sometimes"
+            strength: 0.3
+            method: ["duration_up"]
+        pauses:
+          - { t0: 3.0, t1: 3.25, type: "filled" }
+          - { t0: 4.8, t1: 5.0, type: "unfilled" }
+      voice_quality:
+        creak: 0.5
+        breathiness: 0.55
+        nasal: 0.15
+        tension: 0.1
+        smile: 0.0
+    interaction:
+      tone_preservation: 0.2
+      emotion_pitch_override: 0.8
+      intonation_overlay: "additive"
+    tokens:
+      - id: "tok_010"
+        t0: 2.6
+        t1: 2.8
+        kind: "word"
+        text: "But"
+        ipa: "bʌt"
+        stress: 0
+
+      - id: "tok_011"
+        t0: 2.8
+        t1: 2.95
+        kind: "word"
+        text: "I"
+        ipa: "aɪ"
+        stress: 0
+
+      - id: "tok_012"
+        t0: 2.95
+        t1: 3.25
+        kind: "word"
+        text: "guess"
+        ipa: "ɡɛs"
+        stress: 1
+        tracks:
+          voice_quality:
+            creak: 0.6
+
+      - id: "evt_001"
+        t0: 3.25
+        t1: 3.5
+        kind: "event"
+        event: "silence"
+        confidence: 0.95
+
+      - id: "tok_013"
+        t0: 3.5
+        t1: 3.7
+        kind: "word"
+        text: "it's"
+        ipa: "ɪts"
+        stress: 0
+
+      - id: "tok_014"
+        t0: 3.7
+        t1: 3.95
+        kind: "word"
+        text: "just"
+        ipa: "dʒʌst"
+        stress: 0
+
+      - id: "tok_015"
+        t0: 3.95
+        t1: 4.15
+        kind: "word"
+        text: "how"
+        ipa: "haʊ"
+        stress: 0
+
+      - id: "tok_016"
+        t0: 4.15
+        t1: 4.45
+        kind: "word"
+        text: "things"
+        ipa: "θɪŋz"
+        stress: 1
+
+      - id: "tok_017"
+        t0: 4.45
+        t1: 4.7
+        kind: "word"
+        text: "go"
+        ipa: "ɡoʊ"
+        stress: 1
+        tracks:
+          prosody:
+            pitch_st: -1.0
+
+      - id: "tok_018"
+        t0: 5.0
+        t1: 5.55
+        kind: "word"
+        text: "sometimes"
+        ipa: "ˈsʌmtaɪmz"
+        stress: 1
+        tracks:
+          prosody:
+            pitch_st: -3.0
+            energy_db: -2.0
+          voice_quality:
+            creak: 0.7
+            breathiness: 0.6
+
+    events:
+      - t0: 4.7
+        t1: 5.0
+        type: "breath"
+        confidence: 0.85
+
+    notes:
+      - "Speaker exhibits classic 'disappointed sigh' pattern with falling intonation"
+      - "Creaky voice increases toward end of utterance indicating resignation"
+      - "Filled pause after 'guess' indicates cognitive processing / hesitation"

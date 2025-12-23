@@ -1,0 +1,560 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prosograph.org/schema/prosograph-1.0.json",
+  "title": "Prosograph Document",
+  "description": "Time-aligned annotation artifact for speech/audio capturing lexical content + paralinguistics",
+  "type": "object",
+  "required": ["prosograph", "audio", "segments"],
+  "additionalProperties": true,
+  "properties": {
+    "prosograph": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$",
+      "description": "Semantic version string (1.x)"
+    },
+    "id": {
+      "type": "string",
+      "description": "Globally unique identifier (URN/URL recommended)"
+    },
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "audio": {
+      "$ref": "#/$defs/audio"
+    },
+    "defaults": {
+      "$ref": "#/$defs/defaults"
+    },
+    "tracks": {
+      "$ref": "#/$defs/trackDefinitions"
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/segment"
+      }
+    },
+    "lexicon": {
+      "$ref": "#/$defs/lexicon"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Vendor/user extensions (namespaced)"
+    }
+  },
+
+  "$defs": {
+    "timeValue": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Time in seconds (IEEE-754 double)"
+    },
+
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score [0,1]"
+    },
+
+    "unitInterval": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Value in range [0,1]"
+    },
+
+    "signedUnitInterval": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "description": "Value in range [-1,1]"
+    },
+
+    "meta": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_by": {
+          "type": "object",
+          "properties": {
+            "tool": { "type": "string" },
+            "version": { "type": "string" }
+          }
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "recording_id": { "type": "string" },
+            "transcript_source": {
+              "type": "string",
+              "enum": ["human", "model", "hybrid"]
+            },
+            "alignment_source": { "type": "string" }
+          }
+        },
+        "profile": {
+          "type": "string",
+          "enum": ["PG-Core", "PG-Expressive", "PG-Tonal"]
+        },
+        "normalization": {
+          "type": "object",
+          "properties": {
+            "scheme": { "type": "string" }
+          }
+        },
+        "references": {
+          "type": "object",
+          "properties": {
+            "energy_db_ref": { "type": "string" }
+          }
+        },
+        "licenses": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+
+    "audio": {
+      "type": "object",
+      "required": ["uri", "duration_s"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "Pointer to audio asset"
+        },
+        "duration_s": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Duration in seconds (must be > 0)"
+        },
+        "sample_rate_hz": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channels": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "codec": { "type": "string" },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "timebase": {
+          "type": "object",
+          "properties": {
+            "origin": {
+              "type": "number",
+              "default": 0.0
+            },
+            "offset_s": {
+              "type": "number",
+              "default": 0.0
+            }
+          }
+        }
+      }
+    },
+
+    "speakerBaseline": {
+      "type": "object",
+      "properties": {
+        "f0_hz": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Baseline pitch in Hz"
+        },
+        "f0_range_hz": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "loudness_lufs": { "type": "number" }
+      }
+    },
+
+    "speaker": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "baseline": { "$ref": "#/$defs/speakerBaseline" }
+      }
+    },
+
+    "emotionTrack": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "vad": {
+          "type": "object",
+          "required": ["valence", "arousal", "dominance"],
+          "properties": {
+            "valence": { "$ref": "#/$defs/signedUnitInterval" },
+            "arousal": { "$ref": "#/$defs/unitInterval" },
+            "dominance": { "$ref": "#/$defs/unitInterval" }
+          }
+        },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "source": {
+          "type": "string",
+          "enum": ["human", "model", "hybrid"]
+        }
+      }
+    },
+
+    "contourPoint": {
+      "type": "object",
+      "required": ["t", "f0_hz"],
+      "properties": {
+        "t": { "$ref": "#/$defs/timeValue" },
+        "f0_hz": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+
+    "prosodyTrack": {
+      "type": "object",
+      "properties": {
+        "rate_wpm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pitch_st": {
+          "type": "number",
+          "description": "Relative shift in semitones"
+        },
+        "pitch_range_st": {
+          "type": "number",
+          "minimum": 0
+        },
+        "energy_db": {
+          "type": "number",
+          "description": "Relative shift in dB"
+        },
+        "contour": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/contourPoint" }
+        },
+        "local_time": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+
+    "emphasisItem": {
+      "type": "object",
+      "properties": {
+        "span": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "token_ids": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          ]
+        },
+        "strength": { "$ref": "#/$defs/unitInterval" },
+        "method": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pitch_up", "duration_up", "energy_up", "pause_before", "pause_after"]
+          }
+        }
+      }
+    },
+
+    "pauseItem": {
+      "type": "object",
+      "required": ["t0", "t1"],
+      "properties": {
+        "t0": { "$ref": "#/$defs/timeValue" },
+        "t1": { "$ref": "#/$defs/timeValue" },
+        "type": {
+          "type": "string",
+          "enum": ["dramatic", "breath", "filled", "unfilled"]
+        }
+      }
+    },
+
+    "deliveryTrack": {
+      "type": "object",
+      "properties": {
+        "enunciation": {
+          "type": "string",
+          "description": "Open vocabulary: crisp, careful, casual, slurred, hyper, etc."
+        },
+        "clarity": { "$ref": "#/$defs/unitInterval" },
+        "emphasis": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/emphasisItem" }
+        },
+        "pauses": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pauseItem" }
+        }
+      }
+    },
+
+    "voiceQualityTrack": {
+      "type": "object",
+      "properties": {
+        "creak": { "$ref": "#/$defs/unitInterval" },
+        "breathiness": { "$ref": "#/$defs/unitInterval" },
+        "nasal": { "$ref": "#/$defs/unitInterval" },
+        "tension": { "$ref": "#/$defs/unitInterval" },
+        "smile": { "$ref": "#/$defs/unitInterval" }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/unitInterval"
+      }
+    },
+
+    "toneRealized": {
+      "type": "object",
+      "properties": {
+        "onset_hz": { "type": "number", "minimum": 0 },
+        "nadir_hz": { "type": "number", "minimum": 0 },
+        "offset_hz": { "type": "number", "minimum": 0 }
+      }
+    },
+
+    "toneSandhi": {
+      "type": "object",
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "rule": { "type": "string" }
+      }
+    },
+
+    "toneTrack": {
+      "type": "object",
+      "properties": {
+        "system": {
+          "type": "string",
+          "enum": ["thai", "mandarin", "vietnamese", "cantonese", "pitch-accent", "stress-accent", "none"]
+        },
+        "phrase_type": {
+          "type": "string",
+          "enum": ["declarative", "interrogative", "continuation", "exclamative"]
+        },
+        "register": {
+          "type": "string",
+          "enum": ["low", "mid", "high"]
+        },
+        "downstep": { "$ref": "#/$defs/unitInterval" },
+        "lexical": { "type": "string" },
+        "surface": { "type": "string" },
+        "sandhi": { "$ref": "#/$defs/toneSandhi" },
+        "contour": {
+          "type": "string",
+          "description": "Symbolic contour (e.g., '33', '24->45')"
+        },
+        "realized": { "$ref": "#/$defs/toneRealized" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+
+    "trackPayloads": {
+      "type": "object",
+      "properties": {
+        "emotion": { "$ref": "#/$defs/emotionTrack" },
+        "prosody": { "$ref": "#/$defs/prosodyTrack" },
+        "delivery": { "$ref": "#/$defs/deliveryTrack" },
+        "voice_quality": { "$ref": "#/$defs/voiceQualityTrack" },
+        "tone": { "$ref": "#/$defs/toneTrack" }
+      },
+      "additionalProperties": true
+    },
+
+    "styleDefaults": {
+      "type": "object",
+      "properties": {
+        "emotion": { "$ref": "#/$defs/emotionTrack" },
+        "prosody": { "$ref": "#/$defs/prosodyTrack" },
+        "delivery": { "$ref": "#/$defs/deliveryTrack" },
+        "voice_quality": { "$ref": "#/$defs/voiceQualityTrack" }
+      }
+    },
+
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "description": "BCP-47 language tag"
+        },
+        "speaker": { "$ref": "#/$defs/speaker" },
+        "style": { "$ref": "#/$defs/styleDefaults" },
+        "tokenization": {
+          "type": "object",
+          "properties": {
+            "unit": {
+              "type": "string",
+              "enum": ["word", "morpheme", "char", "phoneme", "mixed"]
+            }
+          }
+        }
+      }
+    },
+
+    "trackDefinition": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["segment", "token"]
+          }
+        },
+        "overlap": {
+          "type": "string",
+          "enum": ["allow", "forbid", "last_wins", "merge"]
+        }
+      }
+    },
+
+    "trackDefinitions": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/trackDefinition" }
+    },
+
+    "token": {
+      "type": "object",
+      "required": ["id", "t0", "t1"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique within document"
+        },
+        "t0": { "$ref": "#/$defs/timeValue" },
+        "t1": { "$ref": "#/$defs/timeValue" },
+        "kind": {
+          "type": "string",
+          "enum": ["word", "morpheme", "char", "phoneme", "event"]
+        },
+        "text": { "type": "string" },
+        "norm": { "type": "string" },
+        "ipa": { "type": "string" },
+        "stress": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "event": {
+          "type": "string",
+          "enum": ["laugh", "cough", "inhale", "exhale", "lip_smack", "click", "noise", "silence"]
+        },
+        "tracks": { "$ref": "#/$defs/trackPayloads" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "refs": {
+          "type": "object",
+          "properties": {
+            "segment_id": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "eventItem": {
+      "type": "object",
+      "required": ["t0", "t1", "type"],
+      "properties": {
+        "t0": { "$ref": "#/$defs/timeValue" },
+        "t1": { "$ref": "#/$defs/timeValue" },
+        "type": { "type": "string" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+
+    "interaction": {
+      "type": "object",
+      "properties": {
+        "tone_preservation": { "$ref": "#/$defs/unitInterval" },
+        "emotion_pitch_override": { "$ref": "#/$defs/unitInterval" },
+        "intonation_overlay": {
+          "type": "string",
+          "enum": ["additive", "multiplicative", "unspecified"]
+        }
+      }
+    },
+
+    "intent": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "target": { "type": "string" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      },
+      "additionalProperties": true
+    },
+
+    "segment": {
+      "type": "object",
+      "required": ["id", "t0", "t1"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique within document"
+        },
+        "t0": { "$ref": "#/$defs/timeValue" },
+        "t1": { "$ref": "#/$defs/timeValue" },
+        "language": {
+          "type": "string",
+          "description": "BCP-47 override"
+        },
+        "speaker_id": { "type": "string" },
+        "text": { "type": "string" },
+        "normalized_text": { "type": "string" },
+        "intent": { "$ref": "#/$defs/intent" },
+        "tracks": { "$ref": "#/$defs/trackPayloads" },
+        "tokens": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/token" }
+        },
+        "events": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/eventItem" }
+        },
+        "interaction": { "$ref": "#/$defs/interaction" },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "lexicon": {
+      "type": "object",
+      "properties": {
+        "tone_inventory": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "emotion_inventory": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
